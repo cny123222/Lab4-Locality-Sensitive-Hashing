@@ -21,7 +21,7 @@ def compute_knn_time(
     """
     Compute the average time for KNN search
     """
-    knn = KNN()
+    knn = KNN(normalize=False)
     for i in range(1, 41):
         img_path = f"dataset/{i}.jpg"
         knn.add(img_path)
@@ -47,7 +47,7 @@ def compute_lsh_time(
     init_time = 0
     for i in range(repeat_times[0]):
         start_time = time.time()
-        lsh = LSH(indicators)
+        lsh = LSH(indicators, normalize=False)
         if multithread:
             threads = []
             for i in range(1, 41):
@@ -186,7 +186,7 @@ def plot_similarity(
     plt.xticks(range(1, 41), fontsize=10) 
     plt.grid(axis='y', alpha=0.5)
     plt.tight_layout()
-    save_path = "results/similarity_new.png" if not resnet else "results/similarity_resnet.png"
+    save_path = "results/similarity_new.png" if not resnet else "results/similarity_resnet_new.png"
     plt.savefig(save_path, dpi=300)
     plt.show()
 
@@ -194,8 +194,8 @@ def plot_similarity(
 def main():
     # plot_lsh_knn(range(1, 25), 100, "results/time_comp_new.png")
     # plot_init_search(range(1, 25), (500, 100), "results/time_init_search_new.png")
-    plot_similarity(resnet=False)
-
+    # plot_similarity(resnet=False)
+    pass
 
 if __name__ == '__main__':
     main()

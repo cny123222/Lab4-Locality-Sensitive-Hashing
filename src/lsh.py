@@ -10,11 +10,13 @@ class LSH:
     def __init__(
             self, 
             indicators: Union[list, np.ndarray],
-            resnet: bool = False
+            resnet: bool = False,
+            normalize: bool = True
     ):
         self.hash_tab = {}
         self.indicators = np.array(indicators) if isinstance(indicators, list) else indicators
         self.resnet = resnet
+        self.normalize = normalize
 
     def add(
             self, 
@@ -23,7 +25,7 @@ class LSH:
         """
         Add a dataset image to the hash table
         """
-        img = Image(img_path, self.resnet)
+        img = Image(img_path, self.resnet, self.normalize)
         hash_val = tuple(self._projection(img.feature_vec, self.indicators))
         if hash_val not in self.hash_tab:
             self.hash_tab[hash_val] = [img_path]
@@ -37,7 +39,7 @@ class LSH:
         """
         Search for the most similar image in the dataset
         """
-        image = Image(img_path, self.resnet)
+        image = Image(img_path, self.resnet, self.normalize)
         hash_val = tuple(self._projection(image.feature_vec, self.indicators))
         if hash_val not in self.hash_tab:
             return None
@@ -75,7 +77,7 @@ class LSH:
         """
         Calculate the distance between the target image and the image in the dataset
         """
-        img = Image(img_path, self.resnet)
+        img = Image(img_path, self.resnet, self.normalize)
         dist = np.linalg.norm(img.feature_vec - target_img.feature_vec)
         return img, dist
         

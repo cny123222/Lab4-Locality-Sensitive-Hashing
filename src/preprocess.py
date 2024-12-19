@@ -15,18 +15,20 @@ class Image:
     def __init__(
             self,
             img_path: str,
-            resnet: bool = False
+            resnet: bool = False, 
+            normalize: bool = True
     ):
         self.path = img_path
         img = cv2.imread(img_path)
         if not resnet:
-            self.feature_vec = extract_color_feature(img)
+            self.feature_vec = extract_color_feature(img, normalize)
         else:
             self.feature_vec = extract_resnet_feature(img)
         
 
 def extract_color_feature(
-        img: np.ndarray
+        img: np.ndarray, 
+        normalize: bool = True
 ) -> np.ndarray:
     """
     Generate color feature vector for the given image
@@ -40,8 +42,10 @@ def extract_color_feature(
         for j in range(2):
             quadrant = img[i * half_H: (i + 1) * half_H, j * half_W: (j + 1) * half_W]
             quadrant_sum = np.sum(quadrant, axis=(0, 1))
-            # rgb.extend(quadrant_sum / np.linalg.norm(quadrant_sum))
-            rgb.extend(quadrant_sum)
+            if normalize:
+                rgb.extend(quadrant_sum / np.linalg.norm(quadrant_sum))
+            else:
+                rgb.extend(quadrant_sum)
 
     # Generate feature vector
     lb = min(rgb) + (max(rgb) - min(rgb)) / 3
