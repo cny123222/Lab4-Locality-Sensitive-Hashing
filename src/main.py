@@ -13,7 +13,8 @@ def parse_args(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("--image-dir", type=str, default="dataset", help="Path to folder containing dataset images")
     parser.add_argument("--type", type=str, choices=["LSH", "KNN", "comp"], default="LSH", help="Choose the algorithm to use")
-    parser.add_argument("--indicator", type=list, default=[1, 5, 9, 13, 17, 21], help="Projection indicators for LSH")
+    parser.add_argument("--indicator", type=list, default=[1, 8, 16, 24], help="Projection indicators for LSH")
+    parser.add_argument("--resnet", type=bool, default=False, help="Use ResNet to generate feature vector")
     parser.add_argument("--target-dir", type=str, default="target.jpg", help="path to the target image")
 
     args = parser.parse_args(args)
@@ -41,7 +42,7 @@ def main(args):
     tasks = ["LSH", "KNN"] if args.type == "comp" else [args.type]
 
     for type in tasks:
-        searcher = LSH(args.indicator) if type == "LSH" else KNN()
+        searcher = LSH(args.indicator, args.resnet) if type == "LSH" else KNN(args.resnet)
         img_paths = get_image_paths(args.image_dir)
         for img_path in img_paths:
             searcher.add(img_path)

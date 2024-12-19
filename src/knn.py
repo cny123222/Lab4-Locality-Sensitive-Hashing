@@ -6,8 +6,12 @@ class KNN:
     K-Nearest Neighbors
     """
 
-    def __init__(self):
+    def __init__(
+            self, 
+            resnet: bool = False
+    ):
         self.image_paths = []
+        self.resnet = resnet
 
     def add(
             self, 
@@ -25,7 +29,7 @@ class KNN:
         """
         Search for the most similar image in the dataset
         """
-        image = Image(img_path)
+        image = Image(img_path, self.resnet)
         
         min_dist = float('inf')
         min_img = None
@@ -46,6 +50,6 @@ class KNN:
         """
         Calculate the distance between the target image and the image in the dataset
         """
-        img = Image(img_path)
+        img = Image(img_path, self.resnet)
         dist = np.linalg.norm(img.feature_vec - target_img.feature_vec)
         return img, dist
