@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Union
-from preprocess import Image
+from src.preprocess import Image
+
 
 class LSH:
     """
@@ -9,11 +10,11 @@ class LSH:
 
     def __init__(
             self, 
-            indicators: Union[list, np.ndarray],
+            indicators: Union[list, np.ndarray],  # Projection set
             resnet: bool = False,
             normalize: bool = True
     ):
-        self.hash_tab = {}
+        self.hash_tab = {}  # Hash table to store the dataset
         self.indicators = np.array(indicators) if isinstance(indicators, list) else indicators
         self.resnet = resnet
         self.normalize = normalize
@@ -64,10 +65,11 @@ class LSH:
         """
         Project the feature vector to the given projection set
         """
+        assert np.all(1 <= indicators) and np.all(indicators <= 24)
         proj_1 = (indicators - 1) // 2
         proj_2 = (indicators - 1) % 2 + 1
-        hash_res = (proj_2 <= feature_vec[proj_1]).astype(np.uint8)
-        return tuple(hash_res)
+        hash_val = (proj_2 <= feature_vec[proj_1]).astype(np.uint8)
+        return tuple(hash_val)  # hash_val will be used as the key in a dict
     
     def _calc_dist(
             self,
@@ -80,7 +82,3 @@ class LSH:
         img = Image(img_path, self.resnet, self.normalize)
         dist = np.linalg.norm(img.feature_vec - target_img.feature_vec)
         return img, dist
-        
-
-if __name__ == '__main__':
-    pass

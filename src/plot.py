@@ -1,14 +1,15 @@
+import sys
 import time
 import threading
 from tqdm import tqdm
 import numpy as np
 from typing import Tuple
 import matplotlib.pyplot as plt
-from lsh import LSH
-from knn import KNN
-from preprocess import Image
+from src.lsh import LSH
+from src.knn import KNN
+from src.preprocess import Image
 
-# 设置全局字体
+# Plot settings
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.size'] = 11
 plt.rcParams['axes.labelsize'] = 11
@@ -21,11 +22,12 @@ def compute_knn_time(
     """
     Compute the average time for KNN search
     """
-    knn = KNN(normalize=False)
+    knn = KNN(normalize=False)  # Skip RGB normalization for better result
     for i in range(1, 41):
         img_path = f"dataset/{i}.jpg"
         knn.add(img_path)
 
+    # Compute the time for KNN search
     knn_time = 0
     for i in range(repeat_times):
         start_time = time.time()
@@ -44,11 +46,12 @@ def compute_lsh_time(
     """
     Compute the average time for LSH search
     """
+    # Compute the time for LSH initialization
     init_time = 0
     for i in range(repeat_times[0]):
         start_time = time.time()
-        lsh = LSH(indicators, normalize=False)
-        if multithread:
+        lsh = LSH(indicators, normalize=False)  # Skip RGB normalization for better result
+        if multithread:  # Use multithreading for better performance
             threads = []
             for i in range(1, 41):
                 img_path = f"dataset/{i}.jpg"
@@ -62,9 +65,9 @@ def compute_lsh_time(
                 img_path = f"dataset/{i}.jpg"
                 lsh.add(img_path)
         init_time += (time.time() - start_time)
-
     init_time /= repeat_times[0]
 
+    # Compute the time for LSH search
     search_time = 0
     for i in range(repeat_times[1]):
         start_time = time.time()
@@ -167,10 +170,12 @@ def plot_similarity(
     """
     Plot the similarity between the target image and all dataset images
     """
+    # Compute feature vector for the target image
     target_img = Image("target.jpg", resnet)
     target_vec = target_img.feature_vec
     target_vec = target_vec / np.linalg.norm(target_vec)
 
+    # Compute similarity between the target image and all dataset images
     similarities = []
     for i in range(1, 41):
         img = Image(f"dataset/{i}.jpg", resnet)
@@ -178,6 +183,7 @@ def plot_similarity(
         img_vec = img_vec / np.linalg.norm(img_vec)
         similarities.append(np.dot(target_vec, img_vec))
         
+    # Plot the similarity
     fig = plt.figure(figsize=(10, 5))
     plt.bar(range(1, 41), similarities)
     plt.xlabel("Image Index")
@@ -191,12 +197,16 @@ def plot_similarity(
     plt.show()
 
 
-def main():
-    # plot_lsh_knn(range(1, 25), 100, "results/time_comp_new.png")
-    # plot_init_search(range(1, 25), (500, 100), "results/time_init_search_new.png")
-    plot_similarity(resnet=True)
-    # print(generate_scatter_indicator(4))
-    pass
+def main(args):
+    if args[0] == "time_comp":
+        plot_lsh_knn(range(1, 25), 100, "results/time_comp_new.png")
+    elif args[0] == "time_init_search":
+        plot_init_search(range(1, 25), (500, 100), "results/time_init_search_new.png")
+    elif args[0] == "similarity":
+        plot_similarity(resnet=False)
+    elif args[0] == "similarity_resnet":
+        plot_similarity(resnet=True)
+
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

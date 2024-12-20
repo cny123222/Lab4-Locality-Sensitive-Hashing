@@ -1,9 +1,10 @@
 import numpy as np
-from preprocess import Image
+from src.preprocess import Image
+
 
 class KNN:
     """
-    K-Nearest Neighbors
+    K-Nearest Neighbors (K = 1)
     """
 
     def __init__(

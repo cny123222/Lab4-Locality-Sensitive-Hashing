@@ -65,29 +65,29 @@ def extract_resnet_feature(
     """
     model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
     model.eval()
-    img = preprocess_image(img)
+    img = preprocess_resnet(img)
     with torch.no_grad():
         features = model(img)
-    features = features.squeeze()
-    feature_vector = features[:12]
+    features = features.squeeze()  # Remove the batch dimension
+    feature_vector = features[:12]  # Extract the first 12 features
     return feature_vector.numpy()
     
 
-def preprocess_image(
+def preprocess_resnet(
         img: np.ndarray
 ):
     """
     Preprocess the image for ResNet
     """
     transform = transforms.Compose([
-        transforms.Resize((224, 224)), 
-        transforms.ToTensor(), 
-        transforms.Normalize(
+        transforms.Resize((224, 224)),   # Resize to 224x224
+        transforms.ToTensor(),           # Convert to tensor
+        transforms.Normalize(            # Normalize
             mean=[0.485, 0.456, 0.406], 
             std=[0.229, 0.224, 0.225]
         )
     ])
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = PILImage.fromarray(img)
-    img = transform(img).unsqueeze(0)
+    img = PILImage.fromarray(img)  # Convert to PIL image
+    img = transform(img).unsqueeze(0)  # Add batch dimension
     return img
