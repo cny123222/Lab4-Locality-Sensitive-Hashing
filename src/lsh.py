@@ -26,7 +26,7 @@ class LSH:
         Add a dataset image to the hash table
         """
         img = Image(img_path, self.resnet, self.normalize)
-        hash_val = tuple(self._projection(img.feature_vec, self.indicators))
+        hash_val = self._projection(img.feature_vec, self.indicators)
         if hash_val not in self.hash_tab:
             self.hash_tab[hash_val] = [img_path]
         else:
@@ -40,7 +40,7 @@ class LSH:
         Search for the most similar image in the dataset
         """
         image = Image(img_path, self.resnet, self.normalize)
-        hash_val = tuple(self._projection(image.feature_vec, self.indicators))
+        hash_val = self._projection(image.feature_vec, self.indicators)
         if hash_val not in self.hash_tab:
             return None
         
@@ -67,7 +67,7 @@ class LSH:
         proj_1 = (indicators - 1) // 2
         proj_2 = (indicators - 1) % 2 + 1
         hash_res = (proj_2 <= feature_vec[proj_1]).astype(np.uint8)
-        return hash_res
+        return tuple(hash_res)
     
     def _calc_dist(
             self,

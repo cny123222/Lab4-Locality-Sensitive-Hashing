@@ -12,7 +12,7 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--image-dir", type=str, default="dataset", help="Path to folder containing dataset images")
-    parser.add_argument("--type", type=str, choices=["LSH", "KNN", "comp"], default="LSH", help="Choose the algorithm to use")
+    parser.add_argument("--type", type=str, choices=["LSH", "NN", "comp"], default="LSH", help="Choose the algorithm to use")
     parser.add_argument("--indicator", type=list, default=[1, 8, 16, 24], help="Projection indicators for LSH")
     parser.add_argument("--resnet", type=bool, default=False, help="Use ResNet to generate feature vector")
     parser.add_argument("--target-dir", type=str, default="target.jpg", help="path to the target image")
@@ -39,7 +39,7 @@ def get_image_paths(input_dir, extensions = ("jpg", "jpeg", "png", "bmp")):
 def main(args):
     args = parse_args(args)
 
-    tasks = ["LSH", "KNN"] if args.type == "comp" else [args.type]
+    tasks = ["LSH", "NN"] if args.type == "comp" else [args.type]
 
     for type in tasks:
         searcher = LSH(args.indicator, args.resnet) if type == "LSH" else KNN(args.resnet)
@@ -60,9 +60,9 @@ def main(args):
         print()
         print(f"{type}:")
         if type == "LSH":
-            print(f"Indicator:{args.indicator}")
-        print("Most similar image:", result_path)
-        print("Time taken:", finish_time - start_time)
+            print(f"Projection Set:{args.indicator}")
+        print(f"Most similar image: {result_path}")
+        print(f"Time taken: {finish_time - start_time}s")
 
     if args.type == "comp":
         speed_up = knn_time / lsh_time

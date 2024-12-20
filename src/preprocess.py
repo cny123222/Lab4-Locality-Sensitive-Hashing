@@ -33,7 +33,7 @@ def extract_color_feature(
     """
     Generate color feature vector for the given image
     """
-    H, W, C = img.shape
+    H, W, C = img.shape 
     half_H, half_W = H // 2, W // 2
     
     # Calculate the sum of RGB values in each quadrant
@@ -43,9 +43,10 @@ def extract_color_feature(
             quadrant = img[i * half_H: (i + 1) * half_H, j * half_W: (j + 1) * half_W]
             quadrant_sum = np.sum(quadrant, axis=(0, 1))
             if normalize:
-                rgb.extend(quadrant_sum / np.linalg.norm(quadrant_sum))
+                rgb.extend(quadrant_sum / np.sum(quadrant_sum))
             else:
                 rgb.extend(quadrant_sum)
+    rgb = np.array(rgb)
 
     # Generate feature vector
     lb = min(rgb) + (max(rgb) - min(rgb)) / 3

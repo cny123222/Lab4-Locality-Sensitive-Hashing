@@ -98,7 +98,7 @@ def plot_init_search(
     # Compute the time for LSH initialization and search
     lsh_init_times = []
     lsh_search_times = []
-    for bucket_num in tqdm(bucket_nums, desc="Different Bucket Numbers"):
+    for bucket_num in tqdm(bucket_nums, desc="Different Dimension of Projection Set"):
         indicators = generate_scatter_indicator(bucket_num)
         init_time, search_time = compute_lsh_time(indicators, repeat_times)
         lsh_init_times.append(init_time)
@@ -109,7 +109,7 @@ def plot_init_search(
     # Plot initialization time
     fig, ax1 = plt.subplots(figsize=(8, 6))
     ax1.plot(bucket_nums, lsh_init_times, marker='o', label="Initialization Time", color='tab:blue')
-    ax1.set_xlabel("Number of Buckets")
+    ax1.set_xlabel("Dimension of Projection Set")
     ax1.set_ylabel("Initialization Time (s)", color='tab:blue')
     ax1.set_ylim(min(lsh_init_times) * 0.95, max(lsh_init_times) * 1.05)
     ax1.tick_params(axis='y', labelcolor='tab:blue')
@@ -142,7 +142,7 @@ def plot_lsh_knn(
     
     # Compute the time for LSH search
     lsh_times = []
-    for bucket_num in tqdm(bucket_nums, desc="Different Bucket Numbers"):
+    for bucket_num in tqdm(bucket_nums, desc="Different Dimension of Projection Set"):
         indicators = generate_scatter_indicator(bucket_num)
         _, lsh_time = compute_lsh_time(indicators, (1, repeat_times))
         lsh_times.append(lsh_time)
@@ -154,7 +154,7 @@ def plot_lsh_knn(
     # Plot the speedup
     fig = plt.figure(figsize=(8, 6))
     plt.plot(bucket_nums, speedup, marker='o')
-    plt.xlabel("Number of Buckets")
+    plt.xlabel("Dimension of Projection Set")
     plt.ylabel("Speedup")
     plt.grid(alpha=0.5)
     plt.savefig(save_path, dpi=300)
@@ -176,7 +176,7 @@ def plot_similarity(
         img = Image(f"dataset/{i}.jpg", resnet)
         img_vec = img.feature_vec
         img_vec = img_vec / np.linalg.norm(img_vec)
-        similarities.append(abs(np.dot(target_vec, img_vec)))
+        similarities.append(np.dot(target_vec, img_vec))
         
     fig = plt.figure(figsize=(10, 5))
     plt.bar(range(1, 41), similarities)
@@ -194,7 +194,8 @@ def plot_similarity(
 def main():
     # plot_lsh_knn(range(1, 25), 100, "results/time_comp_new.png")
     # plot_init_search(range(1, 25), (500, 100), "results/time_init_search_new.png")
-    # plot_similarity(resnet=False)
+    plot_similarity(resnet=True)
+    # print(generate_scatter_indicator(4))
     pass
 
 if __name__ == '__main__':
